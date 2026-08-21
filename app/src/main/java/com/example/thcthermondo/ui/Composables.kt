@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.thcthermondo.constants.DEFAULT_TEMP
 import com.example.thcthermondo.navigation.AppDestination
 import com.example.thcthermondo.ui.theme.THCThermondoTheme
 
@@ -14,17 +15,17 @@ fun NavIcon(destination: AppDestination) {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun TemperatureItem(temperature: Float, modifier: Modifier = Modifier) {
 	Text(
-		text = "Hello $name!",
+		text = "Current temperature: $temperature°",
 		modifier = modifier
 	)
 }
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun TemperatureItemPreview() {
 	THCThermondoTheme {
-		Greeting("World")
+		TemperatureItem(DEFAULT_TEMP)
 	}
 }

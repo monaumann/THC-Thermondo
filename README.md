@@ -12,8 +12,7 @@
 * I chose MVI over MVVM because I felt a Temperature Conflict was more of an expected occurrence and not really an Exception
 
 ## Trade-Offs
-* I went with a hacky way to ensure a conflict would arise between User input & background job
-  * This approach isn't "clean-hacky", since a resolved Conflict will still incur another Conflict, because the version in the background job is only fetching the latestVersion on AppStart and is otherwise decoupled from any version changes in the TemperatureRepo
+* I went with a hacky approach to ensure a Conflict would arise between User changes & background job changes
 
 ## Open TODOs
 * Because of time-constraints I only left TODOs for the "collaborativeMode" Toggle and to show the Snackbar

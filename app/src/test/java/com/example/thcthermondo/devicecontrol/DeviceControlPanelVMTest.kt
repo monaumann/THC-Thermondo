@@ -36,6 +36,7 @@ class DeviceControlPanelVMTest {
 		// viewModelScope is backed by Dispatchers.Main, which must be set on the JVM.
 		Dispatchers.setMain(UnconfinedTestDispatcher())
 		every { temperatureRepo.temperatureStateSF } returns temperatureStateSF
+		every { temperatureRepo.latestTemp } returns initialTemp
 		deviceControlPanelVM = DeviceControlPanelVM(temperatureRepo)
 	}
 
@@ -53,14 +54,18 @@ class DeviceControlPanelVMTest {
 	fun `increaseTemp raises the current temperature by the step`() {
 		deviceControlPanelVM.increaseTemp()
 
-		coVerify(timeout = TIMEOUT) { temperatureRepo.setTemperature(DEFAULT_TEMP + TEMP_STEP) }
+		coVerify(timeout = TIMEOUT) {
+			temperatureRepo.setTemperature(DEFAULT_TEMP + TEMP_STEP, INITIAL_VERSION + 1)
+		}
 	}
 
 	@Test
 	fun `decreaseTemp lowers the current temperature by the step`() {
 		deviceControlPanelVM.decreaseTemp()
 
-		coVerify(timeout = TIMEOUT) { temperatureRepo.setTemperature(DEFAULT_TEMP - TEMP_STEP) }
+		coVerify(timeout = TIMEOUT) {
+			temperatureRepo.setTemperature(DEFAULT_TEMP - TEMP_STEP, INITIAL_VERSION + 1)
+		}
 	}
 
 	@Test
@@ -71,6 +76,8 @@ class DeviceControlPanelVMTest {
 
 		deviceControlPanelVM.increaseTemp()
 
-		coVerify(timeout = TIMEOUT) { temperatureRepo.setTemperature(initialTemp + TEMP_STEP) }
+		coVerify(timeout = TIMEOUT) {
+			temperatureRepo.setTemperature(initialTemp + TEMP_STEP, INITIAL_VERSION + 1)
+		}
 	}
 }

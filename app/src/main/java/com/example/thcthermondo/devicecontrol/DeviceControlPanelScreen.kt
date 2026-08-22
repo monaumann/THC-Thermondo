@@ -30,7 +30,9 @@ fun DeviceControlPanelScreen(modifier: Modifier = Modifier) {
 		val collaborativeMode = OFF
 
 		if (collaborativeMode == ON) {
-			deviceControlPanelVM.setTemperature(temperatureState.newTemp.temperature)
+			val newTemp = temperatureState.newTemp.temperature
+			val newVersion = temperatureState.newTemp.version
+			deviceControlPanelVM.setTemperature(newTemp, newVersion)
 			// TODO: Show Toast/Snackbar
 		} else {
 			ResolveConflictDialog(deviceControlPanelVM, temperatureState)

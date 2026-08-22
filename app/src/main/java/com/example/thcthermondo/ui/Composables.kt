@@ -51,24 +51,45 @@ fun AdjustTempComponent(deviceControlPanelVM: DeviceControlPanelVM) {
 }
 
 @Composable
-fun ResolveConflictDialog(vm: DeviceControlPanelVM, conflict: TemperatureConflict) {
-	val newTemp = conflict.newTemp.temperature
-	val latestTemp = conflict.latestTemp.temperature
+fun ResolveConflictDialog(
+	deviceControlPanelVM: DeviceControlPanelVM,
+	conflict: TemperatureConflict
+) {
+	val newTemp = conflict.newTemp
+	val latestTemp = conflict.latestTemp
+	val technicianTemp = newTemp.temperature
+	val userTemp = latestTemp.temperature
+
 	AlertDialog(
 		onDismissRequest = {},
-		text = { Text(text = "Remote change detected! The technician just set this\n" +
-				"to ${newTemp}°C. Do you want to keep their change or overwrite it?") },
-		confirmButton = {
-			Button(onClick = { vm.setTemperature(newTemp) }) {
-				Text("Keep theirs")
-			}
-		},
-		dismissButton = {
-			Button(onClick = { vm.setTemperature(latestTemp) }) {
-				Text("Overwrite")
-			}
-		}
+		text = { Text(text = formatText(technicianTemp, userTemp)) },
+		confirmButton = { ResolveButton(deviceControlPanelVM, newTemp, "Keep theirs") },
+		dismissButton = { ResolveButton(deviceControlPanelVM, latestTemp, "Overwrite") }
 	)
+}
+
+@Composable
+private fun ResolveButton(
+	deviceControlPanelVM: DeviceControlPanelVM,
+	versionedTemp: VersionedTemperature,
+	text: String
+) {
+	Button(onClick = { updateTemperature(deviceControlPanelVM, versionedTemp) }) {
+		Text(text)
+	}
+}
+
+private fun formatText(technicianTemp: Float, userTemp: Float) =
+	"Remote change detected! The technician just set this to $technicianTemp°C. \n" +
+	"Do you want to keep their change or overwrite it with $userTemp°C?"
+
+private fun updateTemperature(
+	deviceControlPanelVM: DeviceControlPanelVM,
+	versionedTemp: VersionedTemperature
+) {
+	val newTemp = versionedTemp.temperature
+	val newVersion = versionedTemp.version + 1
+	deviceControlPanelVM.setTemperature(newTemp, newVersion)
 }
 
 @Preview(showBackground = true)

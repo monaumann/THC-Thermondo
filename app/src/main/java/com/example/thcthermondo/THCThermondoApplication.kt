@@ -1,8 +1,6 @@
 package com.example.thcthermondo
 
 import android.app.Application
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
 import com.example.thcthermondo.di.appModule
 import com.example.thcthermondo.repo.TemperatureRepo
 import kotlinx.coroutines.CoroutineScope
@@ -25,10 +23,6 @@ private const val REFRESH_INTERVAL_MS = 15_000L
 class THCThermondoApplication : Application(), KoinComponent {
 
 	private lateinit var temperatureRepo: TemperatureRepo
-	// _latestVersion only exist to emulate a conflict/race condition has occurred
-	// On resolving the conflict the version in the Repo increases but this variable isn't "informed"
-	// and therefore triggers another Conflict... but I hope its good enough for a THC :D
-	private lateinit var _latestVersion: MutableState<Int>
 
 	private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 	private var temperatureRefreshJob: Job? = null
@@ -41,7 +35,6 @@ class THCThermondoApplication : Application(), KoinComponent {
 			modules(appModule)
 		}
 		temperatureRepo = get()
-		_latestVersion = mutableIntStateOf(temperatureRepo.latestTemp.version)
 		startTemperatureRefresh()
 	}
 
@@ -57,8 +50,7 @@ class THCThermondoApplication : Application(), KoinComponent {
 	private suspend fun updateTemp() {
 		val latestTemp = temperatureRepo.latestTemp.temperature
 		val newTemp = newTemperature(latestTemp)
-		_latestVersion.value += 1
-		temperatureRepo.setTemperature(newTemp, _latestVersion.value)
+		temperatureRepo.setTemperature(newTemp)
 	}
 
 	private fun newTemperature(currentTemp: Float): Float {

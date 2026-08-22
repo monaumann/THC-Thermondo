@@ -1,7 +1,9 @@
 package com.example.thcthermondo.devicecontrol
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.thcthermondo.ui.AdjustTempComponent
 import com.example.thcthermondo.ui.TemperatureItem
 import com.example.thcthermondo.ui.theme.THCThermondoTheme
 import com.example.thcthermondo.ui.util.collectValue
@@ -13,6 +15,9 @@ fun DeviceControlPanelScreen(modifier: Modifier = Modifier) {
 	val temperature = deviceControlPanelVM.temperatureSF.collectValue()
 
 	THCThermondoTheme {
-		TemperatureItem(temperature, modifier)
+		Column(modifier) {
+			TemperatureItem(temperature)
+			AdjustTempComponent(deviceControlPanelVM)
+		}
 	}
 }

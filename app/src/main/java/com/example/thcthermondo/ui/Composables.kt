@@ -1,14 +1,20 @@
 package com.example.thcthermondo.ui
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.material3.Button
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.thcthermondo.devicecontrol.DeviceControlPanelVM
 import com.example.thcthermondo.shared.DEFAULT_TEMP
 import com.example.thcthermondo.navigation.AppDestination
 import com.example.thcthermondo.shared.VersionedTemperature
 import com.example.thcthermondo.ui.theme.THCThermondoTheme
+import com.example.thcthermondo.ui.theme.paddingS
 
 @Composable
 fun NavIcon(destination: AppDestination) {
@@ -16,13 +22,30 @@ fun NavIcon(destination: AppDestination) {
 }
 
 @Composable
-fun TemperatureItem(latestTemp: VersionedTemperature, modifier: Modifier = Modifier) {
+fun TemperatureItem(latestTemp: VersionedTemperature) {
 	val temperature = latestTemp.temperature
 	val version = latestTemp.version
 	Text(
-		text = "Latest temperature: $temperature° (ver: $version)",
-		modifier = modifier
+		text = "Temperature: $temperature° (ver: $version)"
 	)
+}
+
+@Composable
+fun AdjustTempComponent(deviceControlPanelVM: DeviceControlPanelVM) {
+	Row(verticalAlignment = CenterVertically) {
+		Button(
+			modifier = Modifier.padding(end = paddingS),
+			onClick = { deviceControlPanelVM.increaseTemp() }
+		) {
+			Text("+")
+		}
+		Button(
+			modifier = Modifier.padding(end = paddingS),
+			onClick = { deviceControlPanelVM.decreaseTemp() }
+		) {
+			Text("-")
+		}
+	}
 }
 
 @Preview(showBackground = true)

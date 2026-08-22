@@ -24,17 +24,17 @@ class PrefsRepo(application: Application) {
 		return VersionedTemperature(latestTemp, latestVersion)
 	}
 
-	fun saveTemperature(newTemperature: VersionedTemperature) {
+	suspend fun saveTemperature(newTemperature: VersionedTemperature) {
 		// Ideally the Data should be serialized as LatestTemperature and NOT in two separate fields
 		saveTemperature(newTemperature.temperature)
 		saveVersion(newTemperature.version)
 	}
 
-	private fun saveTemperature(newTemp: Float) {
+	private suspend fun saveTemperature(newTemp: Float) {
 		sharedPrefs.edit { putFloat(KEY_LATEST_TEMP, newTemp) }
 	}
 
-	private fun saveVersion(newVersion: Int) {
+	private suspend fun saveVersion(newVersion: Int) {
 		sharedPrefs.edit { putInt(KEY_LATEST_VERSION, newVersion) }
 	}
 }

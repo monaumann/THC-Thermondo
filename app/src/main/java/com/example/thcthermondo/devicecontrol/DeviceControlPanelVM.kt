@@ -1,28 +1,43 @@
 package com.example.thcthermondo.devicecontrol
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.thcthermondo.repo.TemperatureRepo
 import com.example.thcthermondo.shared.ConflictException
-import com.example.thcthermondo.shared.VersionedTemperature
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
+
+private const val TEMP_STEP = 0.5F
 
 class DeviceControlPanelVM(private val temperatureRepo: TemperatureRepo) : ViewModel() {
 
-	private val _temperatureSF = MutableStateFlow(initTemperature())
-	val temperatureSF: StateFlow<VersionedTemperature> = _temperatureSF
+	val temperatureSF get() = temperatureRepo.temperatureSF
 
-	fun initTemperature(): VersionedTemperature =
-		temperatureRepo.loadTemperature()
+	fun increaseTemp() {
+		val newTemp = (temperatureSF.value.temperature + TEMP_STEP)
+		setTemperature(newTemp)
+	}
 
-	fun setTemperature(newTemp: Float) {
-		// TODO: Wrap logic in a Coroutine and make Repo methods suspend functions
-		try {
-			temperatureRepo.setTemperature(newTemp)
-		} catch (throwable: Throwable) {
-			if (throwable is ConflictException) {
-				// TODO: Handle ConflictException thrown by TemperatureRepo
+	fun decreaseTemp() {
+		val newTemp = (temperatureSF.value.temperature - TEMP_STEP)
+		setTemperature(newTemp)
+	}
+
+	private fun setTemperature(newTemp: Float) {
+		// To improve Testability Dispatchers.IO should be declared through an injected delegate,
+		// so it could be replaced with a TestDispatcher instead of 2sec Timeout in the Test
+		viewModelScope.launch(IO) {
+			try {
+				temperatureRepo.setTemperature(newTemp)
+			} catch (throwable: Throwable) {
+				if (throwable is ConflictException) {
+					handleTempConflict(throwable)
+				}
 			}
 		}
+	}
+
+	private fun handleTempConflict(conflict: ConflictException) {
+		// TODO: Handle the Temperature Conflict according to Collaborative On/Off
 	}
 }

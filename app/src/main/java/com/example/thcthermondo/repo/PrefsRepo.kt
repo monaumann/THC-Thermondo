@@ -15,6 +15,7 @@ private const val KEY_LATEST_VERSION = "LATEST_VERSION"
 
 class PrefsRepo(application: Application) {
 
+	// SharedPrefs should be injected directly instead of Application
 	private val sharedPrefs = application.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
 	fun loadTemperature(): VersionedTemperature {

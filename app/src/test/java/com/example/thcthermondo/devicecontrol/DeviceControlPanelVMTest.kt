@@ -1,9 +1,8 @@
 package com.example.thcthermondo.devicecontrol
 
 import com.example.thcthermondo.repo.TemperatureRepo
-import com.example.thcthermondo.shared.ConflictException
+import com.example.thcthermondo.shared.TemperatureState.ValidTemperature
 import com.example.thcthermondo.shared.VersionedTemperature
-import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -27,7 +26,7 @@ private const val TEMP_STEP = 0.5F
 class DeviceControlPanelVMTest {
 
 	private val initialTemp = VersionedTemperature(DEFAULT_TEMP, INITIAL_VERSION)
-	private val temperatureSF = MutableStateFlow(initialTemp)
+	private val temperatureStateSF = MutableStateFlow(ValidTemperature(initialTemp))
 	private val temperatureRepo = mockk<TemperatureRepo>(relaxed = true)
 
 	private lateinit var deviceControlPanelVM: DeviceControlPanelVM
@@ -36,7 +35,7 @@ class DeviceControlPanelVMTest {
 	fun setUp() {
 		// viewModelScope is backed by Dispatchers.Main, which must be set on the JVM.
 		Dispatchers.setMain(UnconfinedTestDispatcher())
-		every { temperatureRepo.temperatureSF } returns temperatureSF
+		every { temperatureRepo.temperatureStateSF } returns temperatureStateSF
 		deviceControlPanelVM = DeviceControlPanelVM(temperatureRepo)
 	}
 
@@ -47,7 +46,7 @@ class DeviceControlPanelVMTest {
 
 	@Test
 	fun `temperatureSF is delegated straight to the repo`() {
-		assertSame(temperatureSF, deviceControlPanelVM.temperatureSF)
+		assertSame(temperatureStateSF, deviceControlPanelVM.temperatureStateSF)
 	}
 
 	@Test
@@ -67,24 +66,11 @@ class DeviceControlPanelVMTest {
 	@Test
 	fun `temperature step is applied relative to the latest emitted value`() {
 		val initialTemp = 30.0F
-		temperatureSF.value = VersionedTemperature(temperature = initialTemp, version = 5)
+		val latestTemp = VersionedTemperature(temperature = initialTemp, version = 5)
+		temperatureStateSF.value = ValidTemperature(latestTemp)
 
 		deviceControlPanelVM.increaseTemp()
 
 		coVerify(timeout = TIMEOUT) { temperatureRepo.setTemperature(initialTemp + TEMP_STEP) }
-	}
-
-	@Test
-	fun `a ConflictException from the repo is swallowed and does not crash the VM`() {
-		// TODO: Replace when handleTempConflict() is implemented
-		val initialTemp = 20.5F
-		coEvery {
-			temperatureRepo.setTemperature(any())
-		} throws ConflictException(VersionedTemperature(temperature = initialTemp, version = 1))
-
-		// Should not throw off the caller thread; the VM catches it internally.
-		deviceControlPanelVM.increaseTemp()
-
-		coVerify(timeout = TIMEOUT) { temperatureRepo.setTemperature(initialTemp) }
 	}
 }

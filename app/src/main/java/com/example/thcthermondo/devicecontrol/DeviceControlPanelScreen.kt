@@ -12,12 +12,14 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun DeviceControlPanelScreen(modifier: Modifier = Modifier) {
 	val deviceControlPanelVM = koinViewModel<DeviceControlPanelVM>()
-	val temperature = deviceControlPanelVM.temperatureSF.collectValue()
+	val temperatureState = deviceControlPanelVM.temperatureStateSF.collectValue()
+	val latestTemp = temperatureState.latestTemp
 
 	THCThermondoTheme {
 		Column(modifier) {
-			TemperatureItem(temperature)
+			TemperatureItem(latestTemp)
 			AdjustTempComponent(deviceControlPanelVM)
 		}
 	}
+	// TODO: On temperatureState == TemperatureConflict -> show Dialog
 }

@@ -25,10 +25,12 @@ private const val REFRESH_INTERVAL_MS = 15_000L
 class THCThermondoApplication : Application(), KoinComponent {
 
 	private lateinit var temperatureRepo: TemperatureRepo
+	// _latestVersion only exist to emulate a conflict/race condition has occurred
+	// On resolving the conflict the version in the Repo increases but this variable isn't "informed"
+	// and therefore triggers another Conflict... but I hope its good enough for a THC :D
 	private lateinit var _latestVersion: MutableState<Int>
 
-	// App-scoped: survives configuration changes and lives as long as the process.
-	private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+	private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 	private var temperatureRefreshJob: Job? = null
 
 	override fun onCreate() {

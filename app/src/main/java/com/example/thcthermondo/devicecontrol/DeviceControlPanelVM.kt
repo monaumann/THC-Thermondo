@@ -24,7 +24,7 @@ class DeviceControlPanelVM(private val temperatureRepo: TemperatureRepo) : ViewM
 		setTemperature(newTemp)
 	}
 
-	private fun setTemperature(newTemp: Float) {
+	fun setTemperature(newTemp: Float) {
 		// To improve Testability Dispatchers.IO should be declared through an injected delegate,
 		// so it could be replaced with a TestDispatcher instead of 2sec Timeout in the Test
 		viewModelScope.launch(IO) {

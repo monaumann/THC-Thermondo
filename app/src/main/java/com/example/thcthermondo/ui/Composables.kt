@@ -2,6 +2,7 @@ package com.example.thcthermondo.ui
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.thcthermondo.devicecontrol.DeviceControlPanelVM
 import com.example.thcthermondo.shared.DEFAULT_TEMP
 import com.example.thcthermondo.navigation.AppDestination
+import com.example.thcthermondo.shared.TemperatureState.TemperatureConflict
 import com.example.thcthermondo.shared.VersionedTemperature
 import com.example.thcthermondo.ui.theme.THCThermondoTheme
 import com.example.thcthermondo.ui.theme.paddingS
@@ -46,6 +48,27 @@ fun AdjustTempComponent(deviceControlPanelVM: DeviceControlPanelVM) {
 			Text("-")
 		}
 	}
+}
+
+@Composable
+fun ResolveConflictDialog(vm: DeviceControlPanelVM, conflict: TemperatureConflict) {
+	val newTemp = conflict.newTemp.temperature
+	val latestTemp = conflict.latestTemp.temperature
+	AlertDialog(
+		onDismissRequest = {},
+		text = { Text(text = "Remote change detected! The technician just set this\n" +
+				"to ${newTemp}°C. Do you want to keep their change or overwrite it?") },
+		confirmButton = {
+			Button(onClick = { vm.setTemperature(newTemp) }) {
+				Text("Keep theirs")
+			}
+		},
+		dismissButton = {
+			Button(onClick = { vm.setTemperature(latestTemp) }) {
+				Text("Overwrite")
+			}
+		}
+	)
 }
 
 @Preview(showBackground = true)

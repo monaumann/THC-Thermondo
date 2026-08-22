@@ -14,7 +14,7 @@ android {
 	defaultConfig {
 		applicationId = "com.example.thcthermondo"
 		minSdk = 24
-		targetSdk = 36
+		targetSdk = 37
 		versionCode = 1
 		versionName = "1.0"
 
@@ -49,10 +49,17 @@ dependencies {
 	implementation(libs.androidx.compose.ui.tooling.preview)
 	implementation(libs.androidx.compose.material3)
 	implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+	implementation(libs.kotlinx.coroutines.android)
+	implementation(platform(libs.koin.bom))
+	implementation(libs.koin.android)
+	implementation(libs.koin.androidx.compose)
 	testImplementation(libs.junit)
+	testImplementation(libs.kotlinx.coroutines.test)
+	testImplementation(libs.koin.test.junit4)
+	testImplementation(libs.mockk)
 	androidTestImplementation(libs.androidx.junit)
+	androidTestImplementation(libs.mockk.android)
 	androidTestImplementation(libs.androidx.espresso.core)
-	androidTestImplementation(platform(libs.androidx.compose.bom))
 	androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 	debugImplementation(libs.androidx.compose.ui.tooling)
 	debugImplementation(libs.androidx.compose.ui.test.manifest)
